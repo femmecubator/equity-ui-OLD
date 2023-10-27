@@ -1,0 +1,32 @@
+name: 'PR Workflow'
+on:
+  pull_request_target:
+    types:
+      - synchronize
+      - edited
+      - ready_for_review
+      - labeled
+      - reopened
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Unit Test
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+            node-version: 16
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - run: pnpm i --frozen-lockfile
+      - run: pnpm test
+      - name: Cancel previous thread
+        uses: styfle/cancel-workflow-action@0.10.0
+        with:
+          access_token: ${{ secrets.GH_TOKEN }}
+      - name: Pull Request Version Bump
+        uses: fadi-quader-mox/pr-version-bump@v1.0.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
