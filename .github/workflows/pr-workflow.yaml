@@ -9,24 +9,31 @@ on:
       - reopened
 
 jobs:
-  test:
+  pr-validation:
+    name: PR Workflow
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
             node-version: 16
+
+      - name: Setup package manager
       - uses: pnpm/action-setup@v2
         with:
           version: 8
+
       - name: Install dependencies
       - run: pnpm i --frozen-lockfile
+
       - name: Run Unit Test
       - run: pnpm test
+
       - name: Cancel previous thread
         uses: styfle/cancel-workflow-action@0.10.0
         with:
           access_token: ${{ secrets.GH_TOKEN }}
+          
       - name: Pull Request Version Bump
         uses: fadi-quader-mox/pr-version-bump@v1.0.0
         with:
