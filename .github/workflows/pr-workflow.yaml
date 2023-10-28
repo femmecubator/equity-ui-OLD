@@ -12,20 +12,6 @@ on:
 
 
 jobs:
-  init:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - id: init-step
-        uses: actions/setup-node@v3
-        with:
-            node-version: 16
-      - uses: styfle/cancel-workflow-action@0.10.0
-        with:
-          access_token: ${{ secrets.GH_TOKEN }}
-          only_status: waiting
   pr-validation:
     needs: init
     runs-on: ubuntu-latest
