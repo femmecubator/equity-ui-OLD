@@ -1,4 +1,5 @@
-import React, { type FC, type HTMLAttributes, type ReactChild } from 'react'
+import React from 'react'
+import type { FC, HTMLAttributes, ReactChild } from 'react'
 
 export interface Props extends HTMLAttributes<HTMLDivElement> {
   /** custom content, defaults to 'the snozzberries taste like snozzberries' */
