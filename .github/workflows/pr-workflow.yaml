@@ -21,5 +21,14 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: 8
-      - run: pnpm i
+      - run: pnpm i --frozen-lockfile
       - run: pnpm test
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.10.0
+        with:
+          access_token: ${{ secrets.GH_TOKEN }}
+      - uses: 'actions/checkout@v3'
+      - name: PR Version Bump
+        uses: fadi-quader-mox/pr-version-bump@v1.0.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
