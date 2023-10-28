@@ -10,11 +10,14 @@ on:
       - labeled
       - reopened
 
+
 jobs:
   pr-validation:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
             node-version: 16
@@ -23,13 +26,6 @@ jobs:
           version: 8
       - run: pnpm i --frozen-lockfile
       - run: pnpm test
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.10.0
-        with:
-          access_token: ${{ secrets.GH_TOKEN }}
-          only_status: waiting
-      - uses: 'actions/checkout@v3'
-      - name: PR Version Bump
-        uses: fadi-quader-mox/pr-version-bump@v1.0.0
+      - uses: fadi-quader-mox/pr-version-bump@v1.0.0
         with:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
