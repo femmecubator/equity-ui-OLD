@@ -1,0 +1,10 @@
+name: Cancel
+on: [push]
+jobs:
+  cancel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: styfle/cancel-workflow-action
+        with:
+          workflow_id: 'waiting'
