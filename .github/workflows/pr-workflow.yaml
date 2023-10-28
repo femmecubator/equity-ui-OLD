@@ -29,7 +29,7 @@ jobs:
           access_token: ${{ secrets.GH_TOKEN }}
           only_status: waiting
   pr-validation:
-    needs: init-step
+    needs: init
     runs-on: ubuntu-latest
     steps:
       - run: pnpm i --frozen-lockfile
