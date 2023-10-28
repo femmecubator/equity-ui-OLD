@@ -38,7 +38,7 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "equity-ui-lib",
+  "name": "@femmecubator/equity-ui-lib",
   "author": "Carlo",
   "module": "dist/equity-ui-lib.esm.js",
   "size-limit": [
