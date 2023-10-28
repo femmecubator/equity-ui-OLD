@@ -21,9 +21,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
             node-version: 16
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
       - uses: styfle/cancel-workflow-action@0.10.0
         with:
           access_token: ${{ secrets.GH_TOKEN }}
@@ -32,8 +29,11 @@ jobs:
     needs: init
     runs-on: ubuntu-latest
     steps:
-      - run: pnpm i --frozen-lockfile
-      - run: pnpm test
-      - uses: fadi-quader-mox/pr-version-bump@v1.0.0
-        with:
+     - uses: pnpm/action-setup@v2
+       with:
+          version: 8
+     - run: pnpm i --frozen-lockfile
+     - run: pnpm test
+     - uses: fadi-quader-mox/pr-version-bump@v1.0.0
+       with:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
