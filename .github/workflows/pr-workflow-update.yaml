@@ -17,29 +17,30 @@ jobs:
       
       - name: Get Previous Labels
         id: previous_labels
-        run: echo "::set-output name=previous_labels::${{ toJson(github.event.changes.labels.from) }}"
-        
+        run: echo "::set-output name=previous_labels::${{ github.event.changes.labels.from }}"
+
       - name: Check Label Change
         id: check_label_change
         run: |
           const labels = core.getInput('selectedLabel');
-          const previousLabels = JSON.parse(core.getInput('previous_labels'));
+          const previousLabels = core.getInput('previous_labels');
           const currentLabels = JSON.parse(core.getInput('labels'));
 
-          if (!previousLabels || previousLabels.length === 0) {
+          if (previousLabels === 'null' || previousLabels === 'undefined') {
             // PR had no labels previously
             core.setOutput('labelChanged', true);
           } else {
-            const previousVersionLabel = previousLabels.find(label => labels.includes(label.name));
+            const previousLabelsArray = JSON.parse(previousLabels);
+            const previousVersionLabel = previousLabelsArray.find(label => labels.includes(label.name));
             const currentVersionLabel = currentLabels.find(label => labels.includes(label.name));
             core.setOutput('labelChanged', previousVersionLabel !== currentVersionLabel);
           }
 
       - name: Comment with Label Selection
         if: steps.check_label_change.outputs.labelChanged
-        uses: antfu/github-script@2.0.1
+        uses: actions/github-script@v5
         with:
-          github-token: ${{ secrets.GH_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const selectedLabel = core.getInput('selectedLabel');
             const prUserLogin = context.payload.pull_request.user.login;
@@ -52,9 +53,9 @@ jobs:
 
       - name: Comment if No Label Selected
         if: steps.check_label_change.outputs.labelChanged == false
-        uses: antfu/github-script@2.0.1
+        uses: actions/github-script@v5
         with:
-          github-token: ${{ secrets.GH_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const prUserLogin = context.payload.pull_request.user.login;
             github.issues.createComment({
