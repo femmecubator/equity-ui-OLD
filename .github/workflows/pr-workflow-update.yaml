@@ -37,7 +37,7 @@ jobs:
 
       - name: Comment with Label Selection
         if: steps.check_label_change.outputs.labelChanged
-        uses: actions/github-script
+        uses: antfu/github-script@2.0.1
         with:
           github-token: ${{ secrets.GH_TOKEN }}
           script: |
@@ -52,7 +52,7 @@ jobs:
 
       - name: Comment if No Label Selected
         if: steps.check_label_change.outputs.labelChanged == false
-        uses: actions/github-script
+        uses: antfu/github-script@2.0.1
         with:
           github-token: ${{ secrets.GH_TOKEN }}
           script: |
