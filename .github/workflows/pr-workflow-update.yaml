@@ -1,0 +1,30 @@
+name: PR Workflow
+
+on:
+  pull_request:
+    branches:
+     - main 
+    types:
+      - opened
+
+jobs:
+  select_label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment with Label Selection
+        uses: actions/github-script
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const labels = ["major", "minor", "patch"];
+            const selectedLabel = core.getInput('selectedLabel');
+            if (labels.includes(selectedLabel)) {
+              github.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `Selected version bump label: ${selectedLabel}`
+              });
+            } else {
+              core.setFailed(`Invalid label: ${selectedLabel}. Use 'major', 'minor', or 'patch'.`);
+            }
