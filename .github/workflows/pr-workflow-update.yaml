@@ -3,28 +3,63 @@ name: PR Workflow
 on:
   pull_request:
     branches:
-     - main 
+    - main
     types:
-      - opened
+      - synchronize
 
 jobs:
   select_label:
     runs-on: ubuntu-latest
     steps:
+      - name: Get PR Labels
+        id: pr_labels
+        run: echo "::set-output name=labels::${{ toJson(github.event.pull_request.labels) }}"
+      
+      - name: Get Previous Labels
+        id: previous_labels
+        run: echo "::set-output name=previous_labels::${{ toJson(github.event.changes.labels.from) }}"
+        
+      - name: Check Label Change
+        id: check_label_change
+        run: |
+          const labels = core.getInput('selectedLabel');
+          const previousLabels = JSON.parse(core.getInput('previous_labels'));
+          const currentLabels = JSON.parse(core.getInput('labels'));
+
+          if (!previousLabels || previousLabels.length === 0) {
+            // PR had no labels previously
+            core.setOutput('labelChanged', true);
+          } else {
+            const previousVersionLabel = previousLabels.find(label => labels.includes(label.name));
+            const currentVersionLabel = currentLabels.find(label => labels.includes(label.name));
+            core.setOutput('labelChanged', previousVersionLabel !== currentVersionLabel);
+          }
+
       - name: Comment with Label Selection
+        if: steps.check_label_change.outputs.labelChanged
         uses: actions/github-script
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_TOKEN }}
           script: |
-            const labels = ["major", "minor", "patch"];
             const selectedLabel = core.getInput('selectedLabel');
-            if (labels.includes(selectedLabel)) {
-              github.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: `Selected version bump label: ${selectedLabel}`
-              });
-            } else {
-              core.setFailed(`Invalid label: ${selectedLabel}. Use 'major', 'minor', or 'patch'.`);
-            }
+            const prUserLogin = context.payload.pull_request.user.login;
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: prUserLogin,
+              repo: context.repo.repo,
+              body: `Selected version bump label: ${selectedLabel}`
+            })
+
+      - name: Comment if No Label Selected
+        if: steps.check_label_change.outputs.labelChanged == false
+        uses: actions/github-script
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            const prUserLogin = context.payload.pull_request.user.login;
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: prUserLogin,
+              repo: context.repo.repo,
+              body: `No version bump label selected.`
+            })
