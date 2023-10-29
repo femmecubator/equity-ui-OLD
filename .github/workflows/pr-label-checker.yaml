@@ -1,23 +1,60 @@
 name: 'PR Label Checker'
+# on:
+#   pull_request:
+#     branches:
+#       - main
+#     types:
+#       - reopened
+#       - labeled
+#       - unlabeled
+# jobs:
+#   check_labels:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#         with:
+#           fetch-depth: 0
+#       - uses: mheap/github-action-required-labels@v1
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+#         with:
+#           mode: exactly
+#           count: 1
+#           labels: 'major, minor, patch'
 on:
   pull_request:
     branches:
       - main
     types:
-      - reopened
-      - labeled
-      - unlabeled
+      - synchronize
+
 jobs:
-  check_labels:
+  check_skip:
     runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.result_step.outputs.result }}
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: mheap/github-action-required-labels@v1
+      - uses: mstachniuk/ci-skip@master
+        with:
+          commit-filter: 'CI:'
+      - run: echo "::set-output name=result::${CI_SKIP}"
+        id: result_step
+
+  # this job should be skipped
+  test_job:
+    needs: check_skip
+    runs-on: ubuntu-latest
+    if: ${{ needs.check_skip.outputs.skip == 'false' }}
+    steps:
+      - name: PR Label Checker
+        uses: mheap/github-action-required-labels@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           mode: exactly
           count: 1
           labels: 'major, minor, patch'
+      - run: exit 0
