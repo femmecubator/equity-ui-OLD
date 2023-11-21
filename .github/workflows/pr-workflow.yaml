@@ -26,6 +26,3 @@ jobs:
           version: 8
       - run: pnpm i --frozen-lockfile
       - run: pnpm test
-      - uses: fadi-quader-mox/pr-version-bump@v1.0.0
-        with:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
