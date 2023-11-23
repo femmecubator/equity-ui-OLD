@@ -23,3 +23,18 @@ jobs:
         uses: fadi-quader-mox/pr-version-bump@v1.0.0
         with:
           GITHUB_TOKEN: ${{ github.token }}
+  
+  reset-label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove PR Labels
+        uses: octokit/rest.js@v6
+        with:
+          script: |
+            const octokit = new (require('@octokit/rest'))();
+            await octokit.issues.removeLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+          GITHUB_TOKEN: ${{ github.token }}
