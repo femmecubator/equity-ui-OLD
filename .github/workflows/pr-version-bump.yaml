@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Remove PR Labels
-        uses: octokit/rest.js@v20
+        uses: octokit/rest.js
         with:
           script: |
             const octokit = new (require('@octokit/rest'))();
