@@ -14,12 +14,16 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Use Node.js version 18
+        uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: 'pnpm'
-      - run: npm install -g pnpm # Installing pnpm globally
-      - run: pnpm install # Using pnpm to install dependencies
+      - name: Install dependencies
+        run: pnpm install # Using pnpm to install dependencies
       #👇 Adds Chromatic as a step in the workflow
       - uses: chromaui/action@v1
         # Options required for Chromatic's GitHub Action
