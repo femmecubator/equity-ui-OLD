@@ -18,7 +18,8 @@ jobs:
         with:
           node-version: 18
           cache: 'pnpm'
-      - run: pnpm
+      - run: npm install -g pnpm # Installing pnpm globally
+      - run: pnpm install # Using pnpm to install dependencies
       #👇 Adds Chromatic as a step in the workflow
       - uses: chromaui/action@v1
         # Options required for Chromatic's GitHub Action
